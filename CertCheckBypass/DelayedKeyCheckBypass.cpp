@@ -9,17 +9,10 @@ ASBool CertCheckBypass()
 	
 	for (size_t i = 0; i < modInfo.SizeOfImage; i++) {
 		PBYTE pAddress = (PBYTE)modInfo.lpBaseOfDll + i;
-		// 59 0F B7 F8 83 4D FC FF
-		if (memcmp(pAddress, "\x59\x0F\xB7\xF8\x83\x4D\xFC\xFF", 8) == 0) {
-			WriteProcessMemory(GetCurrentProcess(), pAddress + 1, "\x33\xFF\x47", 3, NULL);
+		// FE C8 F6 D8 59 1A C0
+		if (memcmp(pAddress, "\xFE\xC8\xF6\xD8\x59\x1A\xC0", 7) == 0) {
+			WriteProcessMemory(GetCurrentProcess(), pAddress + 5, "\x30", 1, NULL);
 			return true;
-		}
-		// 59 0F B7 F0 8D 4D F0 E8 ?? ?? ?? ?? 66 8B C6
-		if (memcmp(pAddress, "\x59\x0F\xB7\xF0\x8D\x4D\xF0\xE8", 8) == 0) {
-			if (memcmp(pAddress + 12, "\x66\x8B\xC6", 3) == 0) {
-				WriteProcessMemory(GetCurrentProcess(), pAddress + 1, "\x31\xF6\x46", 3, NULL);
-				return true;
-			}
 		}
 	}
 
